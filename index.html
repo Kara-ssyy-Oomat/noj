@@ -70,12 +70,11 @@ h1 {
   <style>
   ...
   .product-img {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
+  width: 100%; /* растягивает картинку на всю ширину ячейки */
+  height: 100px; /* фиксированная высота */
+  object-fit: cover; /* чтобы картинка красиво обрезалась и полностью заполнила рамку */
+  transition: transform 0.3s ease;
+}
   ...
 </style>
 
