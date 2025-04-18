@@ -126,7 +126,7 @@ h1 {
 
   <table>
     <thead>
-      <tr><th>Фото</th><th>Название</th><th>Цена</th><th>Кол-во</th><th>Доб</th></tr>
+      <tr><th>Фото</th><th>Название</th><th>Цена</th><th>Кол-во</th><th>Добавить</th></tr>
     </thead>
     <tbody id="productTable"></tbody>
   </table>
@@ -217,7 +217,7 @@ h1 {
           <td>${p.title}</td>
           <td>${p.price}</td>
           <td><input type="number" min="1" value="1" /></td>
-          <td><button onclick="addToCart('${p.title}', ${p.price}, '${p.image}', this)">добавить</button></td>
+          <td><button onclick="addToCart('${p.title}', ${p.price}, '${p.image}', this)">доб</button></td>
         `;
         productTable.appendChild(row);
       });
