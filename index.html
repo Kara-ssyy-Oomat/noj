@@ -132,6 +132,16 @@ button.delete-order:active {
     font-size: 0.9rem;
   }
 }
+    @media (max-width: 600px) {
+  /* Отключаем универсальное width:100% для number-полей в товарной таблице */
+  #productTable input[type="number"] {
+    width: 60px !important;    /* или подберите свой размер */
+    max-width: none !important;
+    margin: 0;                 /* сбросим auto-margin */
+    padding: 6px;              /* оставим удобную высоту */
+  }
+}
+
 
   </style>
 
