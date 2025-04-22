@@ -399,7 +399,7 @@ h1 {
     ];
     <!-- Галерея товаров -->
 <div class="product-gallery">
-  <img src="img1.jpg" alt="Товар 1" onclick="showImage(this)">
+  <img src="фото/киви.jpg" alt="Товар 1" onclick="showImage(this)">
   <img src="img2.jpg" alt="Товар 2" onclick="showImage(this)">
 </div>
 
@@ -450,8 +450,7 @@ h1 {
         const row = document.createElement('tr');
 
         row.innerHTML = `
-
-          <td><img src="${p.image}" class="product-img" alt="${p.title}"/></td>
+<td><img src="${p.image}" class="product-img" alt="${p.title}" onclick="showImage(this)" /></td>
 
           <td>${p.title}</td>
 
