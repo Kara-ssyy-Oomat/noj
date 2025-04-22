@@ -192,17 +192,6 @@ h1 {
     }
 
 
-    #preview {
-  margin-top: 20px;
-  border: 2px solid #ccc;
-  padding: 10px;
-  max-width: 500px;
-}
-
-#preview img {
-  width: 100%;
-  height: auto;
-}
 
 
 
@@ -725,10 +714,7 @@ ${items}
     ;
 
 
-    function showImage(imgElement) {
-  const previewImg = document.getElementById('preview-img'); 
-  previewImg.src = imgElement.src;
-    }
+    
 
 
 
@@ -825,16 +811,7 @@ ${items}
     updateCart();
 
   </script>
-  <!-- Галерея товаров -->
-<div class="product-gallery">
-  <img src="фото/киви.jpg" alt="Товар 1" onclick="showImage(this)">
-  <img src="img2.jpg" alt="Товар 2" onclick="showImage(this)">
-</div>
-
-<!-- Блок, где будет отображаться выбранное изображение -->
-<div id="preview">
-  <img id="preview-img" src="" alt="Предпросмотр">
-</div>
+  
 
 </body>
 
