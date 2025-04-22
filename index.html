@@ -65,7 +65,7 @@ button.delete-item:hover {
 
 h1 {
 
-  color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
 
 }
 
@@ -314,7 +314,7 @@ h1 {
 
   <button id="toggleHistory">История заказов</button>
 
-  <div id=orderHistory" style="display:none">
+  <div id="orderHistory" style="display:none">
 
     <h2>История заказов</h2>
 
@@ -325,63 +325,63 @@ h1 {
 
 
   <script>
-    const products = [
-      { title: 'нож киви', price: 12, image: 'фото/киви.jpg' },
-      { title: 'виктор 4', price: 20, image: 'фото/вик4.jpg' },
-      { title: 'красный маленький', price: 22, image: 'фото/киз.jpg' },
+ const products = [
+      {id: 1, title: 'нож киви', price: 12, image: 'фото/киви.jpg' },
+      {id: 2, title: 'виктор 4', price: 20, image: 'фото/вик4.jpg' },
+      {id: 3, title: 'красный маленький', price: 22, image: 'фото/киз.jpg' },
 
-      { title: '065', price: 25, image: 'фото2/065.jpg' },
-      { title: 'бургут', price: 25, image: 'фото/бур.jpg' },
-      { title: 'виктор 6', price: 26, image: 'фото/вик6.jpg' },
-      { title: 'м55', price: 26, image: 'фото/м55.jpg' },
-      { title: '608', price: 33, image: 'фото/608.jpg' },
-      { title: 'карона(5)', price: 35, image: 'фото/кар5.jpg' },
-      { title: 'карона(6)', price: 38, image: 'фото/кар6.jpg' },
-      { title: '4004', price: 40, image: 'фото/4004.jpg' },
-      { title: '5004', price: 45, image: 'фото2/5004.jpg' },
-      { title: '6004', price: 50, image: 'фото/6004.jpg' },
-      { title: '5081', price: 40, image: 'фото/5081.jpg' },
-      { title: '6081', price: 45, image: 'фото/6081.jpg' },
-      { title: '6089', price: 40, image: 'фото/6089.jpg' },
+      {id: 4, title: '065', price: 25, image: 'фото2/065.jpg' },
+      {id: 5,  title: 'бургут', price: 25, image: 'фото/бур.jpg' },
+      {id: 6,  title: 'виктор 6', price: 26, image: 'фото/вик6.jpg' },
+      {id: 7,  title: 'м55', price: 26, image: 'фото/м55.jpg' },
+      {id: 8,  title: '608', price: 33, image: 'фото/608.jpg' },
+      {id: 9,  title: 'карона(5)', price: 35, image: 'фото/кар5.jpg' },
+      {id: 10,  title: 'карона(6)', price: 38, image: 'фото/кар6.jpg' },
+      {id:11,  title: '4004', price: 40, image: 'фото/4004.jpg' },
+      {id: 12,  title: '5004', price: 45, image: 'фото2/5004.jpg' },
+      {id: 13,  title: '6004', price: 50, image: 'фото/6004.jpg' },
+      {id: 14,  title: '5081', price: 40, image: 'фото/5081.jpg' },
+      {id: 15,  title: '6081', price: 45, image: 'фото/6081.jpg' },
+      {id: 16,  title: '6089', price: 40, image: 'фото/6089.jpg' },
 
-      { title: 'с5', price: 45, image: 'фото/с5.jpg' },
-      { title: 'с6', price: 50, image: 'фото/с6.jpg' },
-      { title: 'с7', price: 55, image: 'фото2/с7.jpg' },
-      { title: 'резина(6)', price: 50, image: 'фото/резина.jpg' },
-      { title: '6035', price: 50, image: 'фото/6035.jpg' },
+      {id: 17,  title: 'с5', price: 45, image: 'фото/с5.jpg' },
+      {id: 18,  title: 'с6', price: 50, image: 'фото/с6.jpg' },
+      {id: 19,  title: 'с7', price: 55, image: 'фото2/с7.jpg' },
+      {id: 20,  title: 'резина(6)', price: 50, image: 'фото/резина.jpg' },
+      {id: 21,  title: '6035', price: 50, image: 'фото/6035.jpg' },
      
 
-      { title: '037', price: 100, image: 'фото/037.jpg' },
-      { title: '034', price: 100, image: 'фото/034.jpg' },
-      { title: '038', price: 110, image: 'фото/038.jpg' },
-      { title: '039', price: 120, image: 'фото/039.jpg' },
-      { title: 'k118', price: 100, image: 'фото2/118.jpg' },
-      { title: 'k117', price: 120, image: 'фото/117.jpg' },
+      {id: 22,  title: '037', price: 100, image: 'фото/037.jpg' },
+      {id: 23,  title: '034', price: 100, image: 'фото/034.jpg' },
+      {id: 24,  title: '038', price: 110, image: 'фото/038.jpg' },
+      {id: 25,  title: '039', price: 120, image: 'фото/039.jpg' },
+      {id: 26,  title: 'k118', price: 100, image: 'фото2/118.jpg' },
+      {id: 27,  title: 'k117', price: 120, image: 'фото/117.jpg' },
      
-      { title: '6147', price: 80, image: 'фото/6147.jpg' },
-      { title: '6224', price: 110, image: 'фото/6224.jpg' },
-      { title: '7067', price: 180, image: 'фото/7067.jpg' },
-      { title: '7149', price: 100, image: 'фото/7149.jpg' },
-      { title: '7224', price: 120, image: 'фото/7224.jpg' },
-      { title: '8224', price: 130, image: 'фото/8224.jpg' },
-      { title: '9224', price: 140, image: 'фото/9224.jpg' },
-      { title: 'карона(8)', price: 180, image: 'фото/кар8.jpg' },
-      { title: '5643', price: 180, image: 'фото2/5643.jpg' },
-      { title: '5646', price: 180, image: 'фото2/5646.jpg' },
-      { title: '7646', price: 180, image: 'фото2/7646.jpg' },
-      { title: 'керамика(3)пр', price: 100, image: 'фото2/керамика3.jpg' },
-      { title: 'керамика(3)орг', price: 150, image: 'фото2/кер3.jpg' },
-      { title: '', price: 180, image: '' },
-      { title: 'мебел ручка', price: 100, image: 'фото2/мебел.jpg' },
-      { title: 'нержовейка ручка', price: 160, image: 'фото2/нер.jpg' },
-      { title: '027', price: 170, image: 'фото2/027.jpg' },
-      { title: 'нержовейка ручка', price: 260, image: 'фото2/неркат.jpg' },
-      { title: '009', price: 300, image: 'фото2/009.jpg' },
-      { title: '', price: 180, image: '' },
-      { title: '', price: 180, image: '' },
-      { title: '', price: 180, image: '' },
-      { title: '', price: 180, image: '' },
-      { title: 'точилка для ножей', price: 80, image: 'фото2/тач3.jpg' }
+      {id: 28,  title: '6147', price: 80, image: 'фото/6147.jpg' },
+      {id: 29,  title: '6224', price: 110, image: 'фото/6224.jpg' },
+      {id: 30,  title: '7067', price: 180, image: 'фото/7067.jpg' },
+      {id: 31,  title: '7149', price: 100, image: 'фото/7149.jpg' },
+      {id: 32,  title: '7224', price: 120, image: 'фото/7224.jpg' },
+      {id: 33,  title: '8224', price: 130, image: 'фото/8224.jpg' },
+      {id: 34,  title: '9224', price: 140, image: 'фото/9224.jpg' },
+      {id: 35,  title: 'карона(8)', price: 180, image: 'фото/кар8.jpg' },
+      {id: 36,  title: '5643', price: 180, image: 'фото2/5643.jpg' },
+      {id: 37,  title: '5646', price: 180, image: 'фото2/5646.jpg' },
+      {id: 38,  title: '7646', price: 180, image: 'фото2/7646.jpg' },
+      {id: 39,  title: 'керамика(3)пр', price: 100, image: 'фото2/керамика3.jpg' },
+      {id: 40,  title: 'керамика(3)орг', price: 150, image: 'фото2/кер3.jpg' },
+      {id: 41,  title: '', price: 180, image: '' },
+      {id: 42,  title: 'мебел ручка', price: 100, image: 'фото2/мебел.jpg' },
+      {id: 43,  title: 'нержовейка ручка', price: 160, image: 'фото2/нер.jpg' },
+      {id: 44,  title: '027', price: 170, image: 'фото2/027.jpg' },
+      {id: 45,  title: 'нержовейка ручка', price: 260, image: 'фото2/неркат.jpg' },
+      {id: 46,  title: '009', price: 300, image: 'фото2/009.jpg' },
+      {id: 47,  title: '', price: 180, image: '' },
+      {id: 48,  title: '', price: 180, image: '' },
+      {id: 49,  title: '', price: 180, image: '' },
+      {id: 50,  title: '', price: 180, image: '' },
+      {id: 51,  title: 'точилка для ножей', price: 80, image: 'фото2/тач3.jpg' }
       
     ];
 
@@ -406,7 +406,7 @@ h1 {
 
     function renderProducts() {
 
-      let filtered = [...products];
+      let filtered = products.filter(p => p.title?.trim() && p.image?.trim());
 
       if (search.value) {
 
@@ -427,19 +427,12 @@ h1 {
         const row = document.createElement('tr');
 
         row.innerHTML = `
-
-          <td><img src="${p.image}" class="product-img" alt="${p.title}"/></td>
-
-          <td>${p.title}</td>
-
-          <td>${p.price}</td>
-
-          <td><input type="number" min="1" value="1" /></td>
-
-          <td><button onclick="addToCart('${p.title}', ${p.price}, '${p.image}', this)">добавить</button></td>
-
-        `;
-
+  <td><img src="${p.image}" class="product-img" alt="${p.title}"/></td>
+  <td>${p.title}</td>
+  <td>${p.price}</td>
+  <td><input type="number" min="1" value="1" /></td>
+  <td><button onclick="addToCart(${p.id}, '${p.title}', ${p.price}, '${p.image}', this)">добавить</button></td>
+`;
         productTable.appendChild(row);
 
       });
@@ -447,59 +440,32 @@ h1 {
     }
 
 
-
-    function addToCart(title, price, image, btn) {
-
+    function addToCart(id, title, price, image, btn) {
   const qty = +btn.parentElement.parentElement.querySelector('input').value;
-
-  const index = cart.findIndex(item => item.title === title);
-
+  const index = cart.findIndex(item => item.id === id); // Сравнение по id
   if (index !== -1) cart[index].qty += qty;
-
-  else cart.push({ title, price, qty });
-
+  else cart.push({ id, title, price, qty });
   updateCart();
 
-
-
   // Анимация кнопки
-
   btn.classList.add('animate-add');
-
   setTimeout(() => btn.classList.remove('animate-add'), 500);
 
-
-
-  // Показываем уведомление, что товар добавлен в корзину
-
+  // Показываем уведомление
   Swal.fire({
-
     title: 'Товар добавлен в корзину!',
-
     text: `${title} × ${qty} был добавлен в вашу корзину.`,
-
     icon: 'success',
-
     confirmButtonText: 'Ок',
-
-    position: 'bottom', // Уведомление появляется внизу
-
+    position: 'bottom',
     showConfirmButton: true,
-
-    timer: 1500, // Уведомление исчезает через 3 секунды
-
-    padding: '10px', // Дополнительный отступ для предотвращения наложения на другие элементы
-
-    toast: true // Включаем стиль уведомления в виде тоста
-
+    timer: 1500,
+    padding: '10px',
+    toast: true
   });
 
-
-
   // Сохраняем корзину в localStorage
-
   localStorage.setItem('cart', JSON.stringify(cart));
-
 }
 
 
