@@ -817,37 +817,50 @@ ${items}
 Итого: ${total}c`;
   
 
+  fetch('https://api.telegram.org/bot7960727448:AAF0B2mizrzj7sjHP68n-1IcjLoNc6kwVkE/sendMessage', {
+
+    method: 'POST',
+
+    headers: { 'Content-Type': 'application/json' },
+
+    body: JSON.stringify({ chat_id: '5567924440', text: msg })
+    
+
+  })
     fetch('https://api.telegram.org/bot7960727448:AAF0B2mizrzj7sjHP68n-1IcjLoNc6kwVkE/sendMessage', {
 
-      method: 'POST',
+    method: 'POST',
 
-      headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
 
-      body: JSON.stringify({ chat_id: '5567924440', text: msg })
+    body: JSON.stringify({ chat_id: '246421345', text: msg })
+    
 
-    }).then(r => {
+  }).then(r => {
 
-      if (r.ok) {
+    if (r.ok) {
 
-        Swal.fire('Успех!', 'Ваш заказ отправлен!', 'success');
+      Swal.fire('Успех!', 'Ваш заказ отправлен!', 'success');
 
-        cart.length = 0;
+      cart.length = 0;
 
-        updateCart();
+      updateCart();
 
-        localStorage.removeItem('cart');
+      localStorage.removeItem('cart');
+      localStorage.setItem('userData', JSON.stringify({
+    name,
+    phone,
+    address
+  }));
+      document.getElementById('name').value = '';
+      document.getElementById('phone').value = '';
+      document.getElementById('address').value = '';
 
-        document.getElementById('name').value = '';
+    } else {
 
-        document.getElementById('phone').value = '';
+      Swal.fire('Ошибка', 'Не удалось отправить заказ. Попробуйте позже.', 'error');
 
-        document.getElementById('address').value = '';
-
-      } else {
-
-        Swal.fire('Ошибка', 'Не удалось отправить заказ. Попробуйте позже.', 'error');
-
-      }
+    }
 
     }).catch(error => {
 
