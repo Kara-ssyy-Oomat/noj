@@ -1,0 +1,1895 @@
+<!doctype html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+		/>
+		<title>Склад — учёт товаров (3 склада)</title>
+		<style>
+			:root {
+				--bg: #0b1020;
+				--panel: rgba(255, 255, 255, 0.07);
+				--panel2: rgba(255, 255, 255, 0.1);
+				--border: rgba(255, 255, 255, 0.12);
+				--text: rgba(255, 255, 255, 0.92);
+				--muted: rgba(255, 255, 255, 0.72);
+				--muted2: rgba(255, 255, 255, 0.55);
+				--primary: #7c5cff;
+				--danger: #ff4d6d;
+				--ok: #2dd4bf;
+				--warn: #f59e0b;
+				--shadow: 0 18px 70px rgba(0, 0, 0, 0.45);
+				--radius: 16px;
+				--radius2: 12px;
+				--mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+					monospace;
+				--sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans",
+					sans-serif;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			html,
+			body {
+				height: 100%;
+			}
+
+			html {
+				-webkit-text-size-adjust: 100%;
+				text-size-adjust: 100%;
+			}
+
+			body {
+				margin: 0;
+				font-family: var(--sans);
+				color: var(--text);
+				overflow-x: hidden;
+				background: radial-gradient(1200px 700px at 10% 20%, rgba(124, 92, 255, 0.28), transparent 55%),
+					radial-gradient(900px 600px at 90% 30%, rgba(45, 212, 191, 0.18), transparent 55%),
+					radial-gradient(800px 500px at 45% 85%, rgba(245, 158, 11, 0.12), transparent 55%), var(--bg);
+			}
+
+			@media (max-width: 720px) {
+				input,
+				select,
+				textarea {
+					font-size: 16px;
+				}
+			}
+
+			a {
+				color: inherit;
+			}
+
+			.wrap {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 24px;
+			}
+
+			header {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 12px;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: 16px;
+			}
+
+			.title {
+				display: flex;
+				gap: 12px;
+				align-items: baseline;
+			}
+
+			h1 {
+				margin: 0;
+				font-size: 20px;
+				letter-spacing: 0.3px;
+			}
+
+			.subtitle {
+				color: var(--muted2);
+				font-size: 13px;
+			}
+
+			.top-actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+				align-items: center;
+			}
+
+			.btn {
+				appearance: none;
+				border: 1px solid var(--border);
+				background: rgba(255, 255, 255, 0.06);
+				color: var(--text);
+				padding: 10px 12px;
+				border-radius: 12px;
+				cursor: pointer;
+				transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+				user-select: none;
+				font-weight: 600;
+				font-size: 13px;
+				touch-action: manipulation;
+			}
+
+			.btn:hover {
+				background: rgba(255, 255, 255, 0.1);
+				border-color: rgba(255, 255, 255, 0.18);
+				transform: translateY(-1px);
+			}
+
+			.btn:active {
+				transform: translateY(0);
+			}
+
+			.btn.primary {
+				border-color: rgba(124, 92, 255, 0.55);
+				background: rgba(124, 92, 255, 0.22);
+			}
+
+			.btn.danger {
+				border-color: rgba(255, 77, 109, 0.55);
+				background: rgba(255, 77, 109, 0.14);
+			}
+
+			.btn.ghost {
+				background: transparent;
+			}
+
+			.btn.small {
+				padding: 8px 10px;
+				border-radius: 10px;
+				font-size: 12px;
+			}
+
+			.grid {
+				display: grid;
+				grid-template-columns: 260px 1fr;
+				gap: 16px;
+			}
+
+			@media (max-width: 980px) {
+				.grid {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			.card {
+				background: var(--panel);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				overflow: hidden;
+			}
+
+			.card h2 {
+				margin: 0;
+				font-size: 14px;
+				letter-spacing: 0.2px;
+			}
+
+			.card-header {
+				padding: 14px 14px 12px;
+				border-bottom: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 12px;
+			}
+
+			.card-body {
+				padding: 14px;
+			}
+
+			.warehouses {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+
+			.wh {
+				border: 1px solid var(--border);
+				border-radius: 14px;
+				padding: 12px;
+				cursor: pointer;
+				background: rgba(255, 255, 255, 0.05);
+				display: grid;
+				grid-template-columns: 1fr auto;
+				gap: 10px;
+				align-items: center;
+				transition: background 120ms ease, transform 120ms ease, border-color 120ms ease;
+			}
+
+			.wh:hover {
+				background: rgba(255, 255, 255, 0.09);
+				border-color: rgba(255, 255, 255, 0.18);
+				transform: translateY(-1px);
+			}
+
+			.wh.active {
+				background: rgba(124, 92, 255, 0.2);
+				border-color: rgba(124, 92, 255, 0.5);
+			}
+
+			.wh-name {
+				font-weight: 800;
+				font-size: 14px;
+			}
+
+			.wh-meta {
+				color: var(--muted2);
+				font-size: 12px;
+				margin-top: 3px;
+			}
+
+			.pill {
+				font-family: var(--mono);
+				font-size: 12px;
+				color: rgba(255, 255, 255, 0.86);
+				border: 1px solid var(--border);
+				background: rgba(255, 255, 255, 0.06);
+				border-radius: 999px;
+				padding: 6px 10px;
+			}
+
+			.row {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+				align-items: center;
+			}
+
+			.row.stretch {
+				justify-content: space-between;
+			}
+
+			.field {
+				display: grid;
+				gap: 6px;
+				min-width: 180px;
+				flex: 1;
+			}
+
+			label {
+				font-size: 12px;
+				color: var(--muted2);
+			}
+
+			input,
+			select,
+			textarea {
+				width: 100%;
+				padding: 10px 10px;
+				border-radius: 12px;
+				border: 1px solid var(--border);
+				background: rgba(0, 0, 0, 0.18);
+				color: var(--text);
+				outline: none;
+			}
+
+			input::placeholder,
+			textarea::placeholder {
+				color: rgba(255, 255, 255, 0.35);
+			}
+
+			textarea {
+				min-height: 120px;
+				resize: vertical;
+				font-family: var(--mono);
+				font-size: 12px;
+			}
+
+			.help {
+				font-size: 12px;
+				color: var(--muted2);
+				line-height: 1.35;
+			}
+
+			.table {
+				width: 100%;
+				border-collapse: collapse;
+				overflow: hidden;
+				border-radius: 14px;
+				border: 1px solid var(--border);
+			}
+
+			.table th,
+			.table td {
+				text-align: left;
+				padding: 10px 10px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+				vertical-align: middle;
+			}
+
+			.table thead th {
+				font-size: 12px;
+				color: rgba(255, 255, 255, 0.75);
+				background: rgba(255, 255, 255, 0.06);
+			}
+
+			.table tbody tr:hover {
+				background: rgba(255, 255, 255, 0.04);
+			}
+
+			.thumb {
+				width: 42px;
+				height: 42px;
+				border-radius: 12px;
+				object-fit: cover;
+				border: 1px solid rgba(255, 255, 255, 0.16);
+				background: rgba(255, 255, 255, 0.06);
+			}
+
+			.itemline {
+				display: flex;
+				gap: 10px;
+				align-items: center;
+			}
+
+			.itemtext {
+				display: grid;
+				gap: 2px;
+			}
+
+			.qty {
+				font-family: var(--mono);
+				font-weight: 800;
+			}
+
+			.qty.low {
+				color: rgb(251, 191, 36);
+			}
+
+			.qty.zero {
+				color: rgb(248, 113, 113);
+			}
+
+			.actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				justify-content: flex-end;
+			}
+
+			.actionsWrap {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				justify-content: flex-end;
+				align-items: center;
+			}
+
+			.mobileToggle {
+				display: none;
+			}
+
+			@media (max-width: 720px) {
+				.mobileToggle {
+					display: inline-flex;
+				}
+				.actionsWrap {
+					justify-content: flex-start;
+				}
+				.actions {
+					display: none;
+					justify-content: flex-start;
+				}
+				tr.expanded .actions {
+					display: flex;
+				}
+			}
+
+			.muted {
+				color: var(--muted2);
+			}
+
+			.divider {
+				height: 1px;
+				background: rgba(255, 255, 255, 0.1);
+				margin: 12px 0;
+			}
+
+			.toast {
+				position: fixed;
+				left: 50%;
+				bottom: 18px;
+				transform: translateX(-50%);
+				background: rgba(0, 0, 0, 0.55);
+				border: 1px solid rgba(255, 255, 255, 0.16);
+				color: rgba(255, 255, 255, 0.95);
+				padding: 10px 12px;
+				border-radius: 14px;
+				box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 180ms ease, transform 180ms ease;
+				max-width: min(740px, calc(100vw - 24px));
+				font-size: 13px;
+				line-height: 1.35;
+			}
+
+			.toast.show {
+				opacity: 1;
+				transform: translateX(-50%) translateY(-2px);
+			}
+
+			dialog {
+				border: 1px solid rgba(255, 255, 255, 0.14);
+				border-radius: 16px;
+				background: rgba(12, 16, 32, 0.95);
+				color: var(--text);
+				box-shadow: var(--shadow);
+				width: min(720px, calc(100vw - 24px));
+			}
+
+			dialog::backdrop {
+				background: rgba(0, 0, 0, 0.55);
+			}
+
+			.dialog-head {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10px;
+				padding: 14px 14px 10px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+			}
+
+			.dialog-title {
+				font-weight: 900;
+			}
+
+			.dialog-body {
+				padding: 14px;
+				display: grid;
+				gap: 12px;
+			}
+
+			.dialog-actions {
+				padding: 0 14px 14px;
+				display: flex;
+				gap: 10px;
+				justify-content: flex-end;
+			}
+
+			.kpi {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 10px;
+			}
+
+			@media (max-width: 980px) {
+				.kpi {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			.kpi .box {
+				border: 1px solid var(--border);
+				border-radius: 14px;
+				background: rgba(255, 255, 255, 0.05);
+				padding: 12px;
+			}
+
+			.kpi .box.clickable {
+				cursor: pointer;
+				user-select: none;
+				transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+			}
+
+			.kpi .box.clickable:hover {
+				background: rgba(255, 255, 255, 0.08);
+				border-color: rgba(255, 255, 255, 0.18);
+				transform: translateY(-1px);
+			}
+
+			.kpi .box.active {
+				background: rgba(245, 158, 11, 0.12);
+				border-color: rgba(245, 158, 11, 0.35);
+			}
+
+			.kpi .box .v {
+				font-family: var(--mono);
+				font-weight: 900;
+				font-size: 18px;
+				margin-top: 6px;
+			}
+
+			.kpi .box .k {
+				color: var(--muted2);
+				font-size: 12px;
+			}
+
+			.hist {
+				display: grid;
+				gap: 10px;
+			}
+
+			.hist-item {
+				border: 1px solid rgba(255, 255, 255, 0.12);
+				border-radius: 14px;
+				background: rgba(255, 255, 255, 0.05);
+				padding: 12px;
+			}
+
+			.hist-item .top {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+				align-items: baseline;
+				justify-content: space-between;
+			}
+
+			.hist-item .t {
+				font-weight: 900;
+			}
+
+			.hist-item .d {
+				color: var(--muted2);
+				font-size: 12px;
+			}
+
+			.hist-item .m {
+				margin-top: 6px;
+				color: rgba(255, 255, 255, 0.82);
+				font-size: 13px;
+				line-height: 1.35;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="wrap">
+			<header>
+				<div class="title">
+					<h1>Склад — учёт товаров</h1>
+					<div class="subtitle">3 склада • офлайн • данные сохраняются в браузере</div>
+				</div>
+				<div class="top-actions">
+					<button class="btn" id="btnExport" type="button">Экспорт</button>
+					<button class="btn" id="btnImport" type="button">Импорт</button>
+				</div>
+			</header>
+
+			<div class="grid">
+				<section class="card" aria-label="Склады">
+					<div class="card-header">
+						<h2>Склады</h2>
+						<div class="row" style="gap: 8px">
+							<button class="btn small" id="btnRenameWarehouses" type="button">Переименовать</button>
+							<span class="pill" id="pillTotal">—</span>
+						</div>
+					</div>
+					<div class="card-body">
+						<div class="warehouses" id="warehouses"></div>
+						<div class="divider"></div>
+						<div class="help">
+							Подсказка: выберите склад слева, добавляйте товары, а при продаже нажимайте
+							<strong>Продать</strong> — коробки уйдут в минус.
+						</div>
+					</div>
+				</section>
+
+				<main class="card" aria-label="Товары и операции">
+					<div class="card-header">
+						<div>
+							<h2 id="mainTitle">Товары</h2>
+							<div class="subtitle" id="mainSubtitle">—</div>
+						</div>
+						<div class="row" style="gap: 8px">
+							<button class="btn primary" id="btnAdd" type="button">+ Добавить товар</button>
+						</div>
+					</div>
+
+					<div class="card-body">
+						<div class="kpi" id="kpi"></div>
+
+						<div class="divider"></div>
+
+						<div class="row" style="align-items: flex-end">
+							<div class="field" style="min-width: 260px; flex: 2">
+								<label for="search">Поиск</label>
+								<input id="search" type="text" placeholder="Например: сахар, масло, мыло…" />
+							</div>
+							<div class="field" style="min-width: 180px">
+								<label for="lowThreshold">Порог «мало»</label>
+								<input id="lowThreshold" type="number" min="0" step="1" value="1" />
+							</div>
+							<div class="row" style="gap: 8px">
+								<button class="btn" id="btnClearSearch" type="button">Очистить</button>
+							</div>
+						</div>
+
+						<div style="height: 10px"></div>
+
+						<table class="table" aria-label="Список товаров">
+							<thead>
+								<tr>
+									<th style="width: 45%">Товар</th>
+									<th style="width: 20%">Коробок</th>
+									<th style="width: 35%; text-align: right">Действия</th>
+								</tr>
+							</thead>
+							<tbody id="items"></tbody>
+						</table>
+
+						<div style="height: 14px"></div>
+
+						<section aria-label="История операций">
+							<div class="row stretch">
+								<h2 style="margin: 0; font-size: 14px">История (последние 30)</h2>
+								<button class="btn small" id="btnClearHistory" type="button">Очистить историю</button>
+							</div>
+							<div style="height: 10px"></div>
+							<div class="hist" id="history"></div>
+						</section>
+					</div>
+				</main>
+			</div>
+		</div>
+
+		<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+		<dialog id="dlgWarehouses">
+			<form method="dialog" id="formWarehouses">
+				<div class="dialog-head">
+					<div class="dialog-title">Переименовать склад</div>
+					<button class="btn small ghost" value="cancel" type="submit" formnovalidate>Закрыть</button>
+				</div>
+				<div class="dialog-body">
+					<div class="row">
+						<div class="field">
+							<label for="whSelect">Склад</label>
+							<select id="whSelect" name="whSelect"></select>
+						</div>
+						<div class="field" style="min-width: 260px; flex: 2">
+							<label for="whName">Новое название</label>
+							<input id="whName" name="whName" type="text" placeholder="Например: Основной склад" required />
+						</div>
+					</div>
+					<div class="help">Название сохранится на этом устройстве (в браузере).</div>
+				</div>
+				<div class="dialog-actions">
+					<button class="btn" value="cancel" type="submit" formnovalidate>Отмена</button>
+					<button class="btn primary" value="ok" type="submit">Сохранить</button>
+				</div>
+			</form>
+		</dialog>
+
+		<dialog id="dlgItem">
+			<form method="dialog" id="formItem">
+				<div class="dialog-head">
+					<div class="dialog-title" id="dlgItemTitle">Добавить товар</div>
+					  <button class="btn small ghost" value="cancel" type="submit" formnovalidate>Закрыть</button>
+				</div>
+				<div class="dialog-body">
+					<div class="row">
+						<div class="field" style="min-width: 260px; flex: 2">
+							<label for="itemName">Название товара</label>
+							<input id="itemName" name="itemName" type="text" placeholder="Например: сахар" required />
+						</div>
+						<div class="field">
+								<label for="itemQty">Коробок</label>
+							<input id="itemQty" name="itemQty" type="number" min="1" step="1" value="1" required />
+						</div>
+					</div>
+					<div class="row" style="align-items: flex-end">
+						<div class="field" style="min-width: 260px; flex: 2">
+							<label for="itemPhotoUrl">Фото (ссылка, необязательно)</label>
+							<input id="itemPhotoUrl" name="itemPhotoUrl" type="url" placeholder="https://..." />
+						</div>
+						<div class="field" style="min-width: 220px">
+							<label for="itemPhotoFile">Или выбрать фото</label>
+							<input id="itemPhotoFile" name="itemPhotoFile" type="file" accept="image/*" />
+						</div>
+						<div class="field" style="min-width: 120px; flex: 0">
+							<label>Превью</label>
+							<img id="itemPhotoPreview" class="thumb" alt="" style="width: 56px; height: 56px" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="field">
+							<label for="itemWarehouse">Склад</label>
+							<select id="itemWarehouse" name="itemWarehouse"></select>
+						</div>
+						<div class="field" style="flex: 2; min-width: 260px">
+							<label for="itemNote">Комментарий (необязательно)</label>
+							<input id="itemNote" name="itemNote" type="text" placeholder="Например: поставка 10.01" />
+						</div>
+					</div>
+					<div class="help">
+									Если такой товар уже есть на этом складе — коробки просто прибавятся.
+					</div>
+				</div>
+				<div class="dialog-actions">
+					  <button class="btn" value="cancel" type="submit" formnovalidate>Отмена</button>
+					<button class="btn primary" id="btnItemSave" value="ok" type="submit">Сохранить</button>
+				</div>
+			</form>
+		</dialog>
+
+		<dialog id="dlgMove">
+			<form method="dialog" id="formMove">
+				<div class="dialog-head">
+					<div class="dialog-title">Переместить товар</div>
+					  <button class="btn small ghost" value="cancel" type="submit" formnovalidate>Закрыть</button>
+				</div>
+				<div class="dialog-body">
+					<div class="help" id="moveHint">—</div>
+					<div class="row">
+						<div class="field">
+							<label for="moveTo">Куда</label>
+							<select id="moveTo" name="moveTo"></select>
+						</div>
+						<div class="field">
+								<label for="moveQty">Сколько коробок</label>
+							<input id="moveQty" name="moveQty" type="number" min="1" step="1" value="1" required />
+						</div>
+					</div>
+					<div class="field">
+						<label for="moveNote">Комментарий (необязательно)</label>
+						<input id="moveNote" name="moveNote" type="text" placeholder="Например: перенос между складами" />
+					</div>
+				</div>
+				<div class="dialog-actions">
+					  <button class="btn" value="cancel" type="submit" formnovalidate>Отмена</button>
+					<button class="btn primary" value="ok" type="submit">Переместить</button>
+				</div>
+			</form>
+		</dialog>
+
+		<dialog id="dlgSale">
+			<form method="dialog" id="formSale">
+				<div class="dialog-head">
+					<div class="dialog-title">Продажа (минус)</div>
+					  <button class="btn small ghost" value="cancel" type="submit" formnovalidate>Закрыть</button>
+				</div>
+				<div class="dialog-body">
+					<div class="help" id="saleHint">—</div>
+					<div class="row">
+						<div class="field">
+							<label for="saleQty">Сколько коробок продали</label>
+							<input id="saleQty" name="saleQty" type="number" min="1" step="1" value="1" required />
+						</div>
+						<div class="field" style="flex: 2; min-width: 260px">
+							<label for="saleNote">Кому / заметка (необязательно)</label>
+							<input id="saleNote" name="saleNote" type="text" placeholder="Например: клиент Алишер" />
+						</div>
+					</div>
+					<div class="help">
+						Коробки уменьшатся. Ниже нуля уходить нельзя — если нужно, сначала пополните.
+					</div>
+				</div>
+				<div class="dialog-actions">
+					  <button class="btn" value="cancel" type="submit" formnovalidate>Отмена</button>
+					<button class="btn primary" value="ok" type="submit">Списать</button>
+				</div>
+			</form>
+		</dialog>
+
+		<dialog id="dlgImport">
+			<form method="dialog" id="formImport">
+				<div class="dialog-head">
+					<div class="dialog-title">Импорт данных</div>
+					  <button class="btn small ghost" value="cancel" type="submit" formnovalidate>Закрыть</button>
+				</div>
+				<div class="dialog-body">
+					<div class="help">
+						Можно вставить JSON или выбрать файл экспорта. Импорт перезапишет текущие данные.
+					</div>
+					<div class="row" style="align-items: flex-end">
+						<div class="field" style="min-width: 260px">
+							<label for="importFile">Файл (необязательно)</label>
+							<input id="importFile" type="file" accept="application/json" />
+						</div>
+						<div class="row" style="gap: 8px">
+							<button class="btn" id="btnLoadFile" type="button">Загрузить файл</button>
+						</div>
+					</div>
+					<div class="field">
+						<label for="importText">JSON</label>
+						<textarea id="importText" placeholder='{ "version": 1, "warehouses": [...], "items": [...] }'></textarea>
+					</div>
+				</div>
+				<div class="dialog-actions">
+					  <button class="btn" value="cancel" type="submit" formnovalidate>Отмена</button>
+					<button class="btn primary" value="ok" type="submit">Импорт</button>
+				</div>
+			</form>
+		</dialog>
+
+		<!-- Firebase (Firestore) для общей синхронизации. -->
+		<!-- Важно: для работы синхронизации сайт должен открываться по http/https (не file://). -->
+		<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+		<script>
+			"use strict";
+
+			const STORAGE_KEY = "warehouseApp.v1";
+
+			// --- Cloud sync (Firebase/Firestore) ---
+			// 1) Создайте проект Firebase и включите Firestore.
+			// 2) Включите Authentication -> Sign-in method -> Anonymous.
+			// 3) Вставьте сюда конфиг из Firebase Console -> Project settings -> Your apps.
+			// 4) (Опционально) поменяйте CLOUD_DOC_ID, чтобы разделить данные.
+			const FIREBASE_CONFIG = {
+				apiKey: "AIzaSyBwZaKlr_SSRlBJnWm2Acz1BlrNaTxx0U8",
+				authDomain: "adam-fefaa.firebaseapp.com",
+				projectId: "adam-fefaa",
+				storageBucket: "adam-fefaa.firebasestorage.app",
+				messagingSenderId: "782685485568",
+				appId: "1:782685485568:web:40a1ff5b3035c4da1cf6e5",
+				measurementId: "G-SNNGLXXLZZ",
+			};
+
+			const CLOUD_COLLECTION = "warehouseApps";
+			const CLOUD_DOC_ID = "shared";
+
+			const cloud = {
+				enabled: true,
+				ready: false,
+				uid: "",
+				docRef: null,
+				saveTimer: null,
+				lastLocalPushAt: 0,
+				lastRemoteAt: 0,
+				seenFirstSnapshot: false,
+			};
+
+			function isFirebaseConfigured() {
+				return (
+					!!FIREBASE_CONFIG &&
+					typeof FIREBASE_CONFIG.apiKey === "string" &&
+					FIREBASE_CONFIG.apiKey &&
+					!FIREBASE_CONFIG.apiKey.startsWith("PASTE_") &&
+					typeof FIREBASE_CONFIG.projectId === "string" &&
+					FIREBASE_CONFIG.projectId &&
+					!FIREBASE_CONFIG.projectId.startsWith("PASTE_")
+				);
+			}
+
+			function safeJsonClone(value) {
+				// Убирает undefined (Firestore его не принимает) и гарантирует сериализуемость.
+				return JSON.parse(JSON.stringify(value));
+			}
+
+			function getCloudDocRef() {
+				if (!window.firebase) return null;
+				const db = window.firebase.firestore();
+				return db.collection(CLOUD_COLLECTION).doc(CLOUD_DOC_ID);
+			}
+
+			async function initCloudSync() {
+				if (!cloud.enabled) return;
+				if (!window.firebase) {
+					console.warn("Firebase SDK не загрузился. Облачная синхронизация отключена.");
+					return;
+				}
+				if (!isFirebaseConfigured()) {
+					console.warn("Firebase не настроен (вставьте FIREBASE_CONFIG). Используется только localStorage.");
+					return;
+				}
+				if (location.protocol === "file:") {
+					console.warn("Открыто как file:// — Firebase может работать нестабильно. Лучше открыть по http/https.");
+					toast("Откройте сайт по http/https для синхронизации");
+					return;
+				}
+
+				try {
+					window.firebase.initializeApp(FIREBASE_CONFIG);
+				} catch (err) {
+					// Не падаем, если init уже был выполнен.
+					const msg = String(err && err.message ? err.message : err);
+					if (!msg.includes("already exists")) {
+						console.warn("Firebase init error:", err);
+						toast("Ошибка Firebase");
+						return;
+					}
+				}
+
+				try {
+					const auth = window.firebase.auth();
+					await auth.signInAnonymously();
+					cloud.uid = auth.currentUser?.uid || "";
+					cloud.docRef = getCloudDocRef();
+					if (!cloud.docRef) throw new Error("Не получилось создать ссылку на документ");
+
+					// 1) Попробуем загрузить состояние из облака.
+					const snap = await cloud.docRef.get();
+					if (snap.exists) {
+						applyRemoteState(snap.data(), { notify: false });
+					} else {
+						// Если в облаке пусто — зальём локальное состояние как начальное.
+						await pushStateToCloud({ notify: false });
+					}
+
+					// 2) Подписка на обновления — теперь все увидят изменения в реальном времени.
+					cloud.docRef.onSnapshot(
+						(s) => {
+							cloud.seenFirstSnapshot = true;
+							if (!s.exists) return;
+							applyRemoteState(s.data(), { notify: true });
+						},
+						(err) => {
+							console.warn("Firestore onSnapshot error:", err);
+							toast("Ошибка синхронизации");
+						}
+					);
+
+					cloud.ready = true;
+					toast("Синхронизация включена");
+				} catch (err) {
+					console.warn("Cloud sync init error:", err);
+					toast(err?.message || "Не получилось подключить облако");
+				}
+			}
+
+			function applyRemoteState(remote, opts) {
+				try {
+					if (!remote || remote.version !== 1) return;
+					const remoteAt = remote.meta?.updatedAt || 0;
+					if (remoteAt && remoteAt <= cloud.lastRemoteAt) return;
+					// Если это наш же пуш с тем же updatedAt — можно пропустить.
+					if (remote.meta?.updatedBy && remote.meta.updatedBy === cloud.uid && remoteAt === cloud.lastLocalPushAt) {
+						cloud.lastRemoteAt = remoteAt;
+						return;
+					}
+
+					cloud.lastRemoteAt = remoteAt;
+					state = {
+						version: 1,
+						warehouses: Array.isArray(remote.warehouses) ? remote.warehouses : defaultState().warehouses,
+						items: Array.isArray(remote.items) ? remote.items : [],
+						history: Array.isArray(remote.history) ? remote.history : [],
+					};
+
+					// Если активный склад исчез — переключаемся на первый.
+					if (!state.warehouses.some((w) => w.id === activeWarehouseId)) {
+						activeWarehouseId = state.warehouses[0]?.id ?? "w1";
+					}
+
+					saveStateLocalOnly();
+					render();
+					if (opts?.notify) {
+						// Не спамим тостами при первом снимке.
+						if (cloud.seenFirstSnapshot) {
+							toast("Обновлено из облака");
+						}
+					}
+				} catch (err) {
+					console.warn("applyRemoteState error:", err);
+				}
+			}
+
+			async function pushStateToCloud(opts) {
+				if (!cloud.enabled || !cloud.docRef) return;
+				const updatedAt = now();
+				cloud.lastLocalPushAt = updatedAt;
+				const payload = safeJsonClone({
+					...state,
+					meta: {
+						updatedAt,
+						updatedBy: cloud.uid || "",
+					},
+				});
+				try {
+					await cloud.docRef.set(payload, { merge: false });
+					if (opts?.notify) toast("Сохранено в облако");
+				} catch (err) {
+					console.warn("pushStateToCloud error:", err);
+					toast("Не получилось сохранить в облако");
+				}
+			}
+
+			function scheduleCloudSave() {
+				if (!cloud.enabled || !cloud.ready || !cloud.docRef) return;
+				clearTimeout(cloud.saveTimer);
+				cloud.saveTimer = setTimeout(() => {
+					pushStateToCloud({ notify: false });
+				}, 600);
+			}
+
+			/** @typedef {{ id: string, name: string }} Warehouse */
+			/** @typedef {{ id: string, name: string, qty: number, warehouseId: string, photoUrl?: string, createdAt: number, updatedAt: number }} Item */
+			/** @typedef {{ id: string, type: 'add'|'sale'|'move'|'delete'|'adjust'|'warehouseRename', at: number, warehouseId?: string, fromWarehouseId?: string, toWarehouseId?: string, itemName: string, qty: number, note?: string }} HistoryEntry */
+
+			/** @typedef {{ version: 1, warehouses: Warehouse[], items: Item[], history: HistoryEntry[] }} AppState */
+
+			const $ = (sel) => document.querySelector(sel);
+			const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+			const ui = {
+				warehouses: $("#warehouses"),
+				items: $("#items"),
+				history: $("#history"),
+				kpi: $("#kpi"),
+				mainTitle: $("#mainTitle"),
+				mainSubtitle: $("#mainSubtitle"),
+				pillTotal: $("#pillTotal"),
+				search: $("#search"),
+				lowThreshold: $("#lowThreshold"),
+				toast: $("#toast"),
+
+				btnAdd: $("#btnAdd"),
+				btnClearSearch: $("#btnClearSearch"),
+				btnClearHistory: $("#btnClearHistory"),
+				btnExport: $("#btnExport"),
+				btnImport: $("#btnImport"),
+				btnRenameWarehouses: $("#btnRenameWarehouses"),
+
+				dlgWarehouses: $("#dlgWarehouses"),
+				formWarehouses: $("#formWarehouses"),
+				whSelect: $("#whSelect"),
+				whName: $("#whName"),
+
+				dlgItem: $("#dlgItem"),
+				formItem: $("#formItem"),
+				dlgItemTitle: $("#dlgItemTitle"),
+				itemName: $("#itemName"),
+				itemQty: $("#itemQty"),
+				itemPhotoUrl: $("#itemPhotoUrl"),
+				itemPhotoFile: $("#itemPhotoFile"),
+				itemPhotoPreview: $("#itemPhotoPreview"),
+				itemWarehouse: $("#itemWarehouse"),
+				itemNote: $("#itemNote"),
+
+				dlgMove: $("#dlgMove"),
+				formMove: $("#formMove"),
+				moveHint: $("#moveHint"),
+				moveTo: $("#moveTo"),
+				moveQty: $("#moveQty"),
+				moveNote: $("#moveNote"),
+
+				dlgSale: $("#dlgSale"),
+				formSale: $("#formSale"),
+				saleHint: $("#saleHint"),
+				saleQty: $("#saleQty"),
+				saleNote: $("#saleNote"),
+
+				dlgImport: $("#dlgImport"),
+				formImport: $("#formImport"),
+				importFile: $("#importFile"),
+				btnLoadFile: $("#btnLoadFile"),
+				importText: $("#importText"),
+			};
+
+			/** @type {AppState} */
+			let state = loadState();
+			let activeWarehouseId = state.warehouses[0]?.id ?? "w1";
+
+			/** @type {{ mode: 'add'|'adjust', itemId?: string }} */
+			let itemDialogContext = { mode: "add" };
+			let itemDialogPhoto = "";
+			const expandedItemIds = new Set();
+			let lowOnlyFilter = false;
+			/** @type {{ itemId?: string }} */
+			let moveDialogContext = {};
+			/** @type {{ itemId?: string }} */
+			let saleDialogContext = {};
+
+			function newId(prefix) {
+				return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
+			}
+
+			function now() {
+				return Date.now();
+			}
+
+			function normalizeName(name) {
+				return String(name || "")
+					.trim()
+					.replace(/\s+/g, " ");
+			}
+
+			function fmtDt(ts) {
+				const d = new Date(ts);
+				return d.toLocaleString("ru-RU", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+			}
+
+			function toast(message) {
+				ui.toast.textContent = message;
+				ui.toast.classList.add("show");
+				clearTimeout(toast._t);
+				toast._t = setTimeout(() => ui.toast.classList.remove("show"), 2600);
+			}
+
+			function defaultState() {
+				/** @type {AppState} */
+				const s = {
+					version: 1,
+					warehouses: [
+						{ id: "w1", name: "Склад 1" },
+						{ id: "w2", name: "Склад 2" },
+						{ id: "w3", name: "Склад 3" },
+					],
+					items: [],
+					history: [],
+				};
+				return s;
+			}
+
+			function loadState() {
+				try {
+					const raw = localStorage.getItem(STORAGE_KEY);
+					if (!raw) return defaultState();
+					const parsed = JSON.parse(raw);
+					if (!parsed || parsed.version !== 1) return defaultState();
+					if (!Array.isArray(parsed.warehouses) || !Array.isArray(parsed.items) || !Array.isArray(parsed.history)) return defaultState();
+					return parsed;
+				} catch {
+					return defaultState();
+				}
+			}
+
+			function saveStateLocalOnly() {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+			}
+
+			function saveState() {
+				saveStateLocalOnly();
+				scheduleCloudSave();
+			}
+
+			function renameWarehouse(warehouseId, newNameRaw) {
+				const w = warehouseById(warehouseId);
+				if (!w) throw new Error("Склад не найден");
+				const newName = normalizeName(newNameRaw);
+				if (!newName) throw new Error("Введите новое название");
+				const oldName = w.name;
+				w.name = newName;
+				pushHistory({
+					id: newId("h"),
+					type: "warehouseRename",
+					at: now(),
+					warehouseId,
+					itemName: "Склад",
+					qty: 0,
+					note: `${oldName} → ${newName}`,
+				});
+				saveState();
+			}
+
+			function warehouseById(id) {
+				return state.warehouses.find((w) => w.id === id);
+			}
+
+			function itemsInWarehouse(warehouseId) {
+				return state.items
+					.filter((i) => i.warehouseId === warehouseId)
+					.slice()
+					.sort((a, b) => a.name.localeCompare(b.name, "ru"));
+			}
+
+			function findSameItem(warehouseId, name) {
+				const n = normalizeName(name).toLowerCase();
+				return state.items.find((i) => i.warehouseId === warehouseId && i.name.toLowerCase() === n);
+			}
+
+			function pushHistory(entry) {
+				state.history.unshift(entry);
+				if (state.history.length > 30) state.history.length = 30;
+			}
+
+			function addOrIncreaseItem({ warehouseId, name, qty, note }) {
+				const cleanName = normalizeName(name);
+				if (!cleanName) throw new Error("Введите название товара");
+				if (!Number.isFinite(qty) || qty <= 0) throw new Error("Коробок должно быть больше 0");
+
+				const existing = findSameItem(warehouseId, cleanName);
+				const t = now();
+
+				if (existing) {
+					existing.qty += qty;
+					existing.updatedAt = t;
+				} else {
+					state.items.push({
+						id: newId("item"),
+						name: cleanName,
+						qty,
+						warehouseId,
+						photoUrl: undefined,
+						createdAt: t,
+						updatedAt: t,
+					});
+				}
+
+				pushHistory({
+					id: newId("h"),
+					type: "add",
+					at: t,
+					warehouseId,
+					itemName: cleanName,
+					qty,
+					note: normalizeName(note),
+				});
+
+				saveState();
+			}
+
+			function adjustItemQty({ itemId, delta, note, type }) {
+				const item = state.items.find((i) => i.id === itemId);
+				if (!item) throw new Error("Товар не найден");
+				if (!Number.isFinite(delta) || delta === 0) throw new Error("Неверное количество коробок");
+
+				const newQty = item.qty + delta;
+				if (newQty < 0) throw new Error("Нельзя уйти ниже нуля. Сначала пополните.");
+
+				item.qty = newQty;
+				item.updatedAt = now();
+
+				pushHistory({
+					id: newId("h"),
+					type,
+					at: item.updatedAt,
+					warehouseId: item.warehouseId,
+					itemName: item.name,
+					qty: Math.abs(delta),
+					note: normalizeName(note),
+				});
+
+				saveState();
+			}
+
+			function moveItem({ itemId, toWarehouseId, qty, note }) {
+				const item = state.items.find((i) => i.id === itemId);
+				if (!item) throw new Error("Товар не найден");
+				if (item.warehouseId === toWarehouseId) throw new Error("Выберите другой склад");
+				if (!Number.isFinite(qty) || qty <= 0) throw new Error("Коробок должно быть больше 0");
+				if (qty > item.qty) throw new Error("Нельзя переместить больше, чем есть");
+
+				const t = now();
+				const fromWarehouseId = item.warehouseId;
+				const cleanName = item.name;
+				const photoUrl = item.photoUrl;
+
+				// списываем с текущего
+				item.qty -= qty;
+				item.updatedAt = t;
+
+				// добавляем/увеличиваем на другом складе
+				const existing = findSameItem(toWarehouseId, cleanName);
+				if (existing) {
+					existing.qty += qty;
+					existing.updatedAt = t;
+					if (!existing.photoUrl && photoUrl) existing.photoUrl = photoUrl;
+				} else {
+					state.items.push({
+						id: newId("item"),
+						name: cleanName,
+						qty,
+						warehouseId: toWarehouseId,
+						photoUrl: photoUrl,
+						createdAt: t,
+						updatedAt: t,
+					});
+				}
+
+				// если на исходном складе стало 0 — оставим позицию (часто удобно видеть), но можно удалить вручную
+
+				pushHistory({
+					id: newId("h"),
+					type: "move",
+					at: t,
+					fromWarehouseId,
+					toWarehouseId,
+					itemName: cleanName,
+					qty,
+					note: normalizeName(note),
+				});
+
+				saveState();
+			}
+
+			function deleteItem(itemId) {
+				const idx = state.items.findIndex((i) => i.id === itemId);
+				if (idx === -1) throw new Error("Товар не найден");
+				const item = state.items[idx];
+				state.items.splice(idx, 1);
+				pushHistory({
+					id: newId("h"),
+					type: "delete",
+					at: now(),
+					warehouseId: item.warehouseId,
+					itemName: item.name,
+					qty: item.qty,
+					note: "Удалено",
+				});
+				saveState();
+			}
+
+			function computeTotals() {
+				const totalPositions = state.items.length;
+				const totalQty = state.items.reduce((acc, i) => acc + i.qty, 0);
+				const totalNonZero = state.items.filter((i) => i.qty > 0).length;
+				return { totalPositions, totalQty, totalNonZero };
+			}
+
+			function computeWarehouseTotals(warehouseId) {
+				const items = itemsInWarehouse(warehouseId);
+				const positions = items.length;
+				const qty = items.reduce((a, i) => a + i.qty, 0);
+				const nonZero = items.filter((i) => i.qty > 0).length;
+				const lowThreshold = clampInt(parseInt(ui.lowThreshold.value || "5", 10), 0, 1_000_000);
+				const low = items.filter((i) => i.qty > 0 && i.qty <= lowThreshold).length;
+				const zero = items.filter((i) => i.qty === 0).length;
+				return { positions, qty, nonZero, low, zero, lowThreshold };
+			}
+
+			function clampInt(v, min, max) {
+				if (!Number.isFinite(v)) return min;
+				return Math.max(min, Math.min(max, v));
+			}
+
+			function render() {
+				renderWarehouses();
+				renderMain();
+				renderHistory();
+			}
+
+			function renderWarehouses() {
+				const totals = computeTotals();
+				ui.pillTotal.textContent = `${totals.totalQty} кор. • ${totals.totalPositions} поз.`;
+
+				ui.warehouses.innerHTML = "";
+				for (const w of state.warehouses) {
+					const t = computeWarehouseTotals(w.id);
+					const el = document.createElement("div");
+					el.className = `wh ${w.id === activeWarehouseId ? "active" : ""}`;
+					el.tabIndex = 0;
+					el.role = "button";
+					el.ariaLabel = w.name;
+					el.innerHTML = `
+						<div>
+							<div class="wh-name">${escapeHtml(w.name)}</div>
+							<div class="wh-meta">${t.qty} кор. • ${t.positions} поз. • мало: ${t.low} • ноль: ${t.zero}</div>
+						</div>
+						<div class="pill">${escapeHtml(w.id.toUpperCase())}</div>
+					`;
+					el.addEventListener("click", () => {
+						activeWarehouseId = w.id;
+						render();
+					});
+					el.addEventListener("keydown", (e) => {
+						if (e.key === "Enter" || e.key === " ") {
+							e.preventDefault();
+							activeWarehouseId = w.id;
+							render();
+						}
+					});
+					ui.warehouses.appendChild(el);
+				}
+			}
+
+			function renderMain() {
+				const w = warehouseById(activeWarehouseId);
+				ui.mainTitle.textContent = w ? `Товары — ${w.name}` : "Товары";
+				const totals = computeWarehouseTotals(activeWarehouseId);
+				ui.mainSubtitle.textContent = `${totals.qty} кор. • ${totals.positions} позиций (в наличии: ${totals.nonZero})${lowOnlyFilter ? ` • фильтр: мало (≤ ${totals.lowThreshold})` : ""}`;
+
+				ui.kpi.innerHTML = `
+					<div class="box">
+						<div class="k">Всего на складе</div>
+						<div class="v">${totals.qty} кор.</div>
+					</div>
+					<div class="box">
+						<div class="k">Позиции</div>
+						<div class="v">${totals.positions}</div>
+					</div>
+					<div class="box clickable ${lowOnlyFilter ? "active" : ""}" data-kpi="low" role="button" tabindex="0" aria-pressed="${lowOnlyFilter ? "true" : "false"}">
+						<div class="k">Мало (≤ ${totals.lowThreshold})</div>
+						<div class="v">${totals.low}</div>
+					</div>
+				`;
+
+				renderItemsTable();
+				refreshWarehouseSelects();
+			}
+
+			function renderItemsTable() {
+				const q = (ui.search.value || "").trim().toLowerCase();
+				const lowThreshold = clampInt(parseInt(ui.lowThreshold.value || "5", 10), 0, 1_000_000);
+				let items = itemsInWarehouse(activeWarehouseId).filter((i) => i.name.toLowerCase().includes(q));
+				if (lowOnlyFilter) {
+					items = items.filter((i) => i.qty > 0 && i.qty <= lowThreshold);
+				}
+
+				if (items.length === 0) {
+					ui.items.innerHTML = `
+						<tr>
+							<td colspan="3" class="muted">Пока пусто. Нажмите «Добавить товар».</td>
+						</tr>
+					`;
+					return;
+				}
+
+				ui.items.innerHTML = "";
+				for (const item of items) {
+					const tr = document.createElement("tr");
+					const expanded = expandedItemIds.has(item.id);
+					tr.className = expanded ? "expanded" : "";
+					const qtyClass = item.qty === 0 ? "zero" : item.qty <= lowThreshold ? "low" : "";
+					const imgHtml = item.photoUrl
+						? `<img class="thumb" src="${escapeAttr(item.photoUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" />`
+						: `<div class="thumb" aria-hidden="true"></div>`;
+					tr.innerHTML = `
+						<td>
+							<div class="itemline">
+								${imgHtml}
+								<div class="itemtext">
+									<div style="font-weight: 900">${escapeHtml(item.name)}</div>
+									<div class="muted" style="font-size: 12px">Обновлено: ${escapeHtml(fmtDt(item.updatedAt))}</div>
+								</div>
+							</div>
+						</td>
+						<td><span class="qty ${qtyClass}">${item.qty}</span></td>
+						<td>
+							<div class="actionsWrap">
+								<button class="btn small mobileToggle" data-act="toggle" data-id="${escapeAttr(item.id)}" aria-expanded="${expanded ? "true" : "false"}" type="button">${expanded ? "Свернуть" : "Развернуть"}</button>
+								<div class="actions">
+									<button class="btn small" data-act="plus" data-id="${escapeAttr(item.id)}" type="button">Пополнить</button>
+									<button class="btn small primary" data-act="sale" data-id="${escapeAttr(item.id)}" type="button">Продать</button>
+									<button class="btn small" data-act="move" data-id="${escapeAttr(item.id)}" type="button">Переместить</button>
+									<button class="btn small danger" data-act="del" data-id="${escapeAttr(item.id)}" type="button">Удалить</button>
+								</div>
+							</div>
+						</td>
+					`;
+					ui.items.appendChild(tr);
+				}
+			}
+
+			function renderHistory() {
+				if (!state.history.length) {
+					ui.history.innerHTML = `<div class="muted">История пуста.</div>`;
+					return;
+				}
+
+				ui.history.innerHTML = "";
+				for (const h of state.history.slice(0, 30)) {
+					const el = document.createElement("div");
+					el.className = "hist-item";
+
+					const title = historyTitle(h);
+					const desc = historyDesc(h);
+
+					el.innerHTML = `
+						<div class="top">
+							<div class="t">${escapeHtml(title)}</div>
+							<div class="d">${escapeHtml(fmtDt(h.at))}</div>
+						</div>
+						<div class="m">${escapeHtml(desc)}${h.note ? `\n${escapeHtml(h.note)}` : ""}</div>
+					`;
+					ui.history.appendChild(el);
+				}
+			}
+
+			function historyTitle(h) {
+				switch (h.type) {
+					case "add":
+						return `Поступление: +${h.qty} кор.`;
+					case "sale":
+						return `Продажа: -${h.qty} кор.`;
+					case "move":
+						return `Перемещение: ${h.qty} кор.`;
+					case "warehouseRename":
+						return `Переименование склада`;
+					case "delete":
+						return `Удаление позиции`;
+					case "adjust":
+						return `Изменение`;
+					default:
+						return "Операция";
+				}
+			}
+
+			function historyDesc(h) {
+				const w = h.warehouseId ? warehouseById(h.warehouseId)?.name : undefined;
+				if (h.type === "warehouseRename") {
+					const wid = h.warehouseId ? h.warehouseId.toUpperCase() : "";
+					return `Склад ${wid}${h.note ? ` • ${h.note}` : ""}`;
+				}
+				if (h.type === "move") {
+					const from = warehouseById(h.fromWarehouseId)?.name ?? h.fromWarehouseId;
+					const to = warehouseById(h.toWarehouseId)?.name ?? h.toWarehouseId;
+					return `${h.itemName} • ${from} → ${to}`;
+				}
+				return `${h.itemName}${w ? ` • ${w}` : ""}`;
+			}
+
+			function refreshWarehouseRenameSelect() {
+				ui.whSelect.innerHTML = "";
+				for (const w of state.warehouses) {
+					const opt = document.createElement("option");
+					opt.value = w.id;
+					opt.textContent = w.name;
+					ui.whSelect.appendChild(opt);
+				}
+				ui.whSelect.value = activeWarehouseId;
+				ui.whName.value = warehouseById(activeWarehouseId)?.name ?? "";
+			}
+
+			function openRenameWarehousesDialog() {
+				refreshWarehouseRenameSelect();
+				ui.dlgWarehouses.showModal();
+				setTimeout(() => ui.whName.focus(), 0);
+			}
+
+			function refreshWarehouseSelects() {
+				// add dialog select
+				ui.itemWarehouse.innerHTML = "";
+				for (const w of state.warehouses) {
+					const opt = document.createElement("option");
+					opt.value = w.id;
+					opt.textContent = w.name;
+					ui.itemWarehouse.appendChild(opt);
+				}
+				ui.itemWarehouse.value = activeWarehouseId;
+
+				// move dialog select
+				ui.moveTo.innerHTML = "";
+				for (const w of state.warehouses) {
+					const opt = document.createElement("option");
+					opt.value = w.id;
+					opt.textContent = w.name;
+					ui.moveTo.appendChild(opt);
+				}
+			}
+
+			function openAddDialog() {
+				itemDialogContext = { mode: "add" };
+				ui.dlgItemTitle.textContent = "Добавить товар";
+				ui.itemName.value = "";
+				ui.itemQty.value = "1";
+				ui.itemPhotoUrl.value = "";
+				ui.itemPhotoFile.value = "";
+				itemDialogPhoto = "";
+				ui.itemPhotoPreview.removeAttribute("src");
+				ui.itemNote.value = "";
+				ui.itemWarehouse.value = activeWarehouseId;
+				ui.dlgItem.showModal();
+				setTimeout(() => ui.itemName.focus(), 0);
+			}
+
+			function openAdjustDialog(itemId) {
+				const item = state.items.find((i) => i.id === itemId);
+				if (!item) return;
+				itemDialogContext = { mode: "adjust", itemId };
+				ui.dlgItemTitle.textContent = `Пополнить: ${item.name}`;
+				ui.itemName.value = item.name;
+				ui.itemName.disabled = true;
+				ui.itemQty.value = "1";
+				itemDialogPhoto = item.photoUrl || "";
+				ui.itemPhotoFile.value = "";
+				ui.itemPhotoUrl.value = item.photoUrl && item.photoUrl.startsWith("http") ? item.photoUrl : "";
+				if (item.photoUrl) {
+					ui.itemPhotoPreview.src = item.photoUrl;
+				} else {
+					ui.itemPhotoPreview.removeAttribute("src");
+				}
+				ui.itemNote.value = "";
+				ui.itemWarehouse.value = item.warehouseId;
+				ui.itemWarehouse.disabled = true;
+				ui.dlgItem.showModal();
+				setTimeout(() => ui.itemQty.focus(), 0);
+			}
+
+			function closeItemDialogCleanup() {
+				ui.itemName.disabled = false;
+				ui.itemWarehouse.disabled = false;
+				ui.itemPhotoFile.value = "";
+			}
+
+			function openMoveDialog(itemId) {
+				const item = state.items.find((i) => i.id === itemId);
+				if (!item) return;
+				moveDialogContext = { itemId };
+				ui.moveHint.textContent = `${item.name} • Сейчас: ${warehouseById(item.warehouseId)?.name ?? item.warehouseId} • В наличии: ${item.qty} кор.`;
+				ui.moveQty.value = "1";
+				ui.moveNote.value = "";
+				ui.moveTo.value = state.warehouses.find((w) => w.id !== item.warehouseId)?.id ?? state.warehouses[0].id;
+				ui.dlgMove.showModal();
+				setTimeout(() => ui.moveQty.focus(), 0);
+			}
+
+			function openSaleDialog(itemId) {
+				const item = state.items.find((i) => i.id === itemId);
+				if (!item) return;
+				saleDialogContext = { itemId };
+				ui.saleHint.textContent = `${item.name} • Склад: ${warehouseById(item.warehouseId)?.name ?? item.warehouseId} • В наличии: ${item.qty} кор.`;
+				ui.saleQty.value = "1";
+				ui.saleNote.value = "";
+				ui.dlgSale.showModal();
+				setTimeout(() => ui.saleQty.focus(), 0);
+			}
+
+			function escapeHtml(s) {
+				return String(s)
+					.replaceAll("&", "&amp;")
+					.replaceAll("<", "&lt;")
+					.replaceAll(">", "&gt;")
+					.replaceAll('"', "&quot;")
+					.replaceAll("'", "&#039;");
+			}
+
+			function escapeAttr(s) {
+				return escapeHtml(s);
+			}
+
+			// --- events ---
+			ui.btnAdd.addEventListener("click", openAddDialog);
+			ui.itemPhotoUrl.addEventListener("input", () => {
+				const url = normalizeName(ui.itemPhotoUrl.value);
+				itemDialogPhoto = url;
+				if (url) ui.itemPhotoPreview.src = url;
+				else ui.itemPhotoPreview.removeAttribute("src");
+			});
+			ui.itemPhotoFile.addEventListener("change", async () => {
+				const file = ui.itemPhotoFile.files?.[0];
+				if (!file) return;
+				try {
+					const dataUrl = await new Promise((resolve, reject) => {
+						const r = new FileReader();
+						r.onload = () => resolve(String(r.result || ""));
+						r.onerror = () => reject(new Error("Не получилось прочитать фото"));
+						r.readAsDataURL(file);
+					});
+					itemDialogPhoto = dataUrl;
+					ui.itemPhotoUrl.value = "";
+					ui.itemPhotoPreview.src = dataUrl;
+				} catch (err) {
+					toast(err.message || "Ошибка фото");
+				}
+			});
+			ui.btnRenameWarehouses.addEventListener("click", openRenameWarehousesDialog);
+
+			ui.whSelect.addEventListener("change", () => {
+				const wid = ui.whSelect.value;
+				ui.whName.value = warehouseById(wid)?.name ?? "";
+			});
+
+			ui.formWarehouses.addEventListener("submit", (e) => {
+				const submitter = e.submitter;
+				const v = submitter?.value;
+				if (v !== "ok") return;
+				e.preventDefault();
+				try {
+					renameWarehouse(ui.whSelect.value, ui.whName.value);
+					toast("Склад переименован");
+					ui.dlgWarehouses.close();
+					render();
+				} catch (err) {
+					toast(err.message || "Ошибка");
+				}
+			});
+			ui.btnClearSearch.addEventListener("click", () => {
+				ui.search.value = "";
+				renderItemsTable();
+			});
+
+			ui.search.addEventListener("input", () => renderItemsTable());
+			ui.lowThreshold.addEventListener("input", () => render());
+
+			ui.kpi.addEventListener("click", (e) => {
+				const box = e.target.closest("[data-kpi]");
+				if (!box) return;
+				const k = box.getAttribute("data-kpi");
+				if (k === "low") {
+					lowOnlyFilter = !lowOnlyFilter;
+					render();
+				}
+			});
+			ui.kpi.addEventListener("keydown", (e) => {
+				const box = e.target.closest?.("[data-kpi]");
+				if (!box) return;
+				if (e.key === "Enter" || e.key === " ") {
+					e.preventDefault();
+					box.click();
+				}
+			});
+
+			ui.items.addEventListener("click", (e) => {
+				const btn = e.target.closest("button[data-act]");
+				if (!btn) return;
+				const act = btn.getAttribute("data-act");
+				const id = btn.getAttribute("data-id");
+				if (!act || !id) return;
+
+				if (act === "toggle") {
+					if (expandedItemIds.has(id)) expandedItemIds.delete(id);
+					else expandedItemIds.add(id);
+					renderItemsTable();
+					return;
+				}
+
+				if (act === "plus") openAdjustDialog(id);
+				if (act === "sale") openSaleDialog(id);
+				if (act === "move") openMoveDialog(id);
+				if (act === "del") {
+					const item = state.items.find((i) => i.id === id);
+					if (!item) return;
+					const ok = confirm(`Удалить позицию «${item.name}» со склада?`);
+					if (!ok) return;
+					try {
+						deleteItem(id);
+						toast("Удалено");
+						render();
+					} catch (err) {
+						toast(err.message || "Ошибка");
+					}
+				}
+			});
+
+			ui.formItem.addEventListener("submit", (e) => {
+				const submitter = e.submitter;
+				const v = submitter?.value;
+				if (v !== "ok") {
+					closeItemDialogCleanup();
+					return;
+				}
+				e.preventDefault();
+
+				try {
+					const name = ui.itemName.value;
+					const qty = clampInt(parseInt(ui.itemQty.value || "0", 10), 1, 1_000_000_000);
+					const warehouseId = ui.itemWarehouse.value;
+					const note = ui.itemNote.value;
+					const photoUrl = normalizeName(itemDialogPhoto);
+
+					if (itemDialogContext.mode === "add") {
+						addOrIncreaseItem({ warehouseId, name, qty, note });
+						if (photoUrl) {
+							const existing = findSameItem(warehouseId, normalizeName(name));
+							if (existing && !existing.photoUrl) {
+								existing.photoUrl = photoUrl;
+								existing.updatedAt = now();
+								saveState();
+							}
+						}
+						activeWarehouseId = warehouseId;
+						toast("Сохранено");
+					} else {
+						// adjust = пополнение
+						adjustItemQty({ itemId: itemDialogContext.itemId, delta: qty, note, type: "add" });
+						if (photoUrl) {
+							const item = state.items.find((i) => i.id === itemDialogContext.itemId);
+							if (item) {
+								item.photoUrl = photoUrl;
+								item.updatedAt = now();
+								saveState();
+							}
+						}
+						toast("Пополнено");
+					}
+
+					closeItemDialogCleanup();
+					ui.dlgItem.close();
+					render();
+				} catch (err) {
+					toast(err.message || "Ошибка");
+				}
+			});
+
+			ui.dlgItem.addEventListener("close", () => {
+				closeItemDialogCleanup();
+			});
+
+			ui.formMove.addEventListener("submit", (e) => {
+				const submitter = e.submitter;
+				const v = submitter?.value;
+				if (v !== "ok") return;
+				e.preventDefault();
+				try {
+					const itemId = moveDialogContext.itemId;
+					const toWarehouseId = ui.moveTo.value;
+					const qty = clampInt(parseInt(ui.moveQty.value || "0", 10), 1, 1_000_000_000);
+					const note = ui.moveNote.value;
+					moveItem({ itemId, toWarehouseId, qty, note });
+					toast("Перемещено");
+					ui.dlgMove.close();
+					render();
+				} catch (err) {
+					toast(err.message || "Ошибка");
+				}
+			});
+
+			ui.formSale.addEventListener("submit", (e) => {
+				const submitter = e.submitter;
+				const v = submitter?.value;
+				if (v !== "ok") return;
+				e.preventDefault();
+				try {
+					const itemId = saleDialogContext.itemId;
+					const qty = clampInt(parseInt(ui.saleQty.value || "0", 10), 1, 1_000_000_000);
+					const note = ui.saleNote.value;
+					adjustItemQty({ itemId, delta: -qty, note, type: "sale" });
+					toast("Списано");
+					ui.dlgSale.close();
+					render();
+				} catch (err) {
+					toast(err.message || "Ошибка");
+				}
+			});
+
+			ui.btnClearHistory.addEventListener("click", () => {
+				const ok = confirm("Очистить историю операций?");
+				if (!ok) return;
+				state.history = [];
+				saveState();
+				renderHistory();
+				toast("История очищена");
+			});
+
+
+			ui.btnExport.addEventListener("click", () => {
+				const data = JSON.stringify(state, null, 2);
+				const blob = new Blob([data], { type: "application/json" });
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = `warehouse-export_${new Date().toISOString().slice(0, 10)}.json`;
+				document.body.appendChild(a);
+				a.click();
+				a.remove();
+				URL.revokeObjectURL(url);
+				toast("Экспорт готов");
+			});
+
+			ui.btnImport.addEventListener("click", () => {
+				ui.importText.value = "";
+				ui.importFile.value = "";
+				ui.dlgImport.showModal();
+			});
+
+			ui.btnLoadFile.addEventListener("click", async () => {
+				const file = ui.importFile.files?.[0];
+				if (!file) {
+					toast("Выберите файл JSON");
+					return;
+				}
+				try {
+					const text = await file.text();
+					ui.importText.value = text;
+					toast("Файл загружен");
+				} catch {
+					toast("Не получилось прочитать файл");
+				}
+			});
+
+			ui.formImport.addEventListener("submit", (e) => {
+				const submitter = e.submitter;
+				const v = submitter?.value;
+				if (v !== "ok") return;
+				e.preventDefault();
+				try {
+					const text = ui.importText.value.trim();
+					if (!text) throw new Error("Вставьте JSON или загрузите файл");
+					const parsed = JSON.parse(text);
+					if (!parsed || parsed.version !== 1) throw new Error("Неверный формат (version)" );
+					if (!Array.isArray(parsed.warehouses) || !Array.isArray(parsed.items) || !Array.isArray(parsed.history)) {
+						throw new Error("Неверный формат данных");
+					}
+					state = parsed;
+					activeWarehouseId = state.warehouses[0]?.id ?? "w1";
+					saveState();
+					ui.dlgImport.close();
+					render();
+					toast("Импорт выполнен");
+				} catch (err) {
+					toast(err.message || "Ошибка импорта");
+				}
+			});
+
+			// initial render
+			render();
+			initCloudSync();
+		</script>
+	</body>
+</html>
